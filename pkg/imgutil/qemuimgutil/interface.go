@@ -8,27 +8,26 @@ import (
 	"os"
 )
 
-// QemuImageUtil is the QEMU implementation of the proxyimgutil.Interface
+// QemuImageUtil is the QEMU implementation of the proxyimgutil Interface.
 type QemuImageUtil struct {
 	// Default format to use when creating disks
 	DefaultFormat string
 }
 
-// NewQemuImageUtil returns a new QemuImageUtil instance with "qcow2" as the default format
+// NewQemuImageUtil returns a new QemuImageUtil instance with "qcow2" as the default format.
 func NewQemuImageUtil() *QemuImageUtil {
 	return &QemuImageUtil{
 		DefaultFormat: "qcow2",
 	}
 }
 
-// CreateDisk creates a new disk image with the specified size
+// CreateDisk creates a new disk image with the specified size.
 func (q *QemuImageUtil) CreateDisk(disk string, size int) error {
 	return createDisk(disk, q.DefaultFormat, size)
 }
 
-// ResizeDisk resizes an existing disk image to the specified size
+// ResizeDisk resizes an existing disk image to the specified size.
 func (q *QemuImageUtil) ResizeDisk(disk string, size int) error {
-	// Get the format of the disk
 	info, err := getInfo(disk)
 	if err != nil {
 		return fmt.Errorf("failed to get info for disk %q: %w", disk, err)
@@ -36,9 +35,8 @@ func (q *QemuImageUtil) ResizeDisk(disk string, size int) error {
 	return resizeDisk(disk, info.Format, size)
 }
 
-// ConvertToRaw converts a disk image to raw format
+// ConvertToRaw converts a disk image to raw format.
 func (q *QemuImageUtil) ConvertToRaw(source, dest string, size *int64, allowSourceWithBackingFile bool) error {
-	// Check if source has a backing file and we don't allow it
 	if !allowSourceWithBackingFile {
 		info, err := getInfo(source)
 		if err != nil {
@@ -49,12 +47,10 @@ func (q *QemuImageUtil) ConvertToRaw(source, dest string, size *int64, allowSour
 		}
 	}
 
-	// Convert to raw
 	if err := convertToRaw(source, dest); err != nil {
 		return err
 	}
 
-	// If size is specified, resize the raw disk after conversion
 	if size != nil {
 		destInfo, err := getInfo(dest)
 		if err != nil {
@@ -69,20 +65,20 @@ func (q *QemuImageUtil) ConvertToRaw(source, dest string, size *int64, allowSour
 	return nil
 }
 
-func (q *QemuImageUtil) MakeSparse(f *os.File, offset int64) error {
-	// Just a placeholder for the interface
+// MakeSparse is a stub implementation as the native package doesn't provide this functionality.
+func (q *QemuImageUtil) MakeSparse(_ *os.File, _ int64) error {
 	return nil
 }
 
-// QemuInfoProvider is the QEMU implementation of the proxyimgutil.InfoProvider
+// QemuInfoProvider is the QEMU implementation of the proxyimgutil InfoProvider.
 type QemuInfoProvider struct{}
 
-// NewQemuInfoProvider returns a new QemuInfoProvider instance
+// NewQemuInfoProvider returns a new QemuInfoProvider instance.
 func NewQemuInfoProvider() *QemuInfoProvider {
 	return &QemuInfoProvider{}
 }
 
-// GetInfo retrieves information about a disk image
+// GetInfo retrieves information about a disk image.
 func (q *QemuInfoProvider) GetInfo(path string) (*Info, error) {
 	qemuInfo, err := getInfo(path)
 	if err != nil {
@@ -92,7 +88,7 @@ func (q *QemuInfoProvider) GetInfo(path string) (*Info, error) {
 	return qemuInfo, nil
 }
 
-// AcceptableAsBasedisk checks if a disk image is acceptable as a base disk
+// AcceptableAsBasedisk checks if a disk image is acceptable as a base disk.
 func (q *QemuInfoProvider) AcceptableAsBasedisk(info *Info) error {
 	return acceptableAsBasedisk(info)
 }
