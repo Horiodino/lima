@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -107,7 +108,7 @@ func (ts *ToolSet) TranslateHostPath(hostPath string) (guestPath, warnings strin
 	if hostPath == "" {
 		return "", "", errors.New("path is empty")
 	}
-	if !filepath.IsAbs(hostPath) {
+	if !filepath.IsAbs(hostPath) && !strings.HasPrefix(hostPath, "/") {
 		return "", "", fmt.Errorf("expected an absolute path, got a relative path: %q", hostPath)
 	}
 
@@ -130,7 +131,8 @@ func (ts *ToolSet) translateToGuestPath(hostPath string) (string, bool) {
 
 		rel, err := filepath.Rel(location, cleanPath)
 		if err == nil && !strings.HasPrefix(rel, "..") && rel != ".." {
-			guestPath := filepath.Join(*mount.MountPoint, rel)
+			rel = filepath.ToSlash(rel)
+			guestPath := path.Join(*mount.MountPoint, rel)
 			return guestPath, true
 		}
 	}

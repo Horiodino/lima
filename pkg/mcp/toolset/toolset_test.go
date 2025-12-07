@@ -88,6 +88,38 @@ func TestTranslateHostPath(t *testing.T) {
 			wantWarnings:  false,
 			wantErr:       false,
 		},
+		{
+			name:     "relative path should error",
+			hostPath: "relative/path",
+			toolSet: ToolSet{
+				inst: &limatype.Instance{
+					Config: &limatype.LimaYAML{
+						Mounts: []limatype.Mount{
+							{Location: "/home/user", MountPoint: &mountPoint1},
+						},
+					},
+				},
+			},
+			wantGuestPath: "",
+			wantWarnings:  false,
+			wantErr:       true,
+		},
+		{
+			name:     "empty path should error",
+			hostPath: "",
+			toolSet: ToolSet{
+				inst: &limatype.Instance{
+					Config: &limatype.LimaYAML{
+						Mounts: []limatype.Mount{
+							{Location: "/home/user", MountPoint: &mountPoint1},
+						},
+					},
+				},
+			},
+			wantGuestPath: "",
+			wantWarnings:  false,
+			wantErr:       true,
+		},
 	}
 
 	for _, test := range tests {
