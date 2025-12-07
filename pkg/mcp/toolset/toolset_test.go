@@ -20,7 +20,7 @@ func TestTranslateHostPath(t *testing.T) {
 		hostPath      string
 		toolSet       ToolSet
 		wantGuestPath string
-		wantLogs      bool
+		wantWarnings  bool
 		wantErr       bool
 	}{
 		{
@@ -36,7 +36,7 @@ func TestTranslateHostPath(t *testing.T) {
 				},
 			},
 			wantGuestPath: "/mnt/home-user/documents/file.txt",
-			wantLogs:      false,
+			wantWarnings:  false,
 			wantErr:       false,
 		},
 		{
@@ -52,7 +52,7 @@ func TestTranslateHostPath(t *testing.T) {
 				},
 			},
 			wantGuestPath: "/other/path/file.txt",
-			wantLogs:      true,
+			wantWarnings:  true,
 			wantErr:       false,
 		},
 		{
@@ -68,7 +68,7 @@ func TestTranslateHostPath(t *testing.T) {
 				},
 			},
 			wantGuestPath: "/home/user2/file.txt",
-			wantLogs:      true,
+			wantWarnings:  true,
 			wantErr:       false,
 		},
 		{
@@ -85,7 +85,7 @@ func TestTranslateHostPath(t *testing.T) {
 				},
 			},
 			wantGuestPath: "/mnt/tmp/myfile",
-			wantLogs:      false,
+			wantWarnings:  false,
 			wantErr:       false,
 		},
 	}
@@ -98,7 +98,7 @@ func TestTranslateHostPath(t *testing.T) {
 			} else {
 				assert.NilError(t, err)
 				assert.Equal(t, test.wantGuestPath, got)
-				if test.wantLogs {
+				if test.wantWarnings {
 					assert.Assert(t, logs != "")
 				} else {
 					assert.Equal(t, "", logs)

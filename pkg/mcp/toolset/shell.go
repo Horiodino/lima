@@ -21,7 +21,7 @@ func (ts *ToolSet) RunShellCommand(ctx context.Context,
 	if ts.inst == nil {
 		return nil, nil, errors.New("instance not registered")
 	}
-	guestPath, logs, err := ts.TranslateHostPath(args.Directory)
+	guestPath, warnings, err := ts.TranslateHostPath(args.Directory)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -48,10 +48,8 @@ func (ts *ToolSet) RunShellCommand(ctx context.Context,
 	callToolRes := &mcp.CallToolResult{
 		StructuredContent: res,
 	}
-	if logs != "" {
-		callToolRes.Meta = map[string]any{
-			"io.lima-vm/logs": []string{logs},
-		}
+	if warnings != "" {
+		callToolRes.Meta[MetaWarnings] = warnings
 	}
 	return callToolRes, res, nil
 }

@@ -103,7 +103,7 @@ func (ts *ToolSet) Close() error {
 	return err
 }
 
-func (ts *ToolSet) TranslateHostPath(hostPath string) (guestPath, logs string, err error) {
+func (ts *ToolSet) TranslateHostPath(hostPath string) (guestPath, warnings string, err error) {
 	if hostPath == "" {
 		return "", "", errors.New("path is empty")
 	}
@@ -113,10 +113,10 @@ func (ts *ToolSet) TranslateHostPath(hostPath string) (guestPath, logs string, e
 
 	guestPath, isMounted := ts.translateToGuestPath(hostPath)
 	if !isMounted {
-		logs = fmt.Sprintf("path %q is not under any mounted directory, using as guest path", hostPath)
-		logrus.Info(logs)
+		warnings = fmt.Sprintf("path %q is not under any mounted directory, using as guest path", hostPath)
+		logrus.Info(warnings)
 	}
-	return guestPath, logs, nil
+	return guestPath, warnings, nil
 }
 
 func (ts *ToolSet) translateToGuestPath(hostPath string) (string, bool) {

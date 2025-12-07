@@ -17,13 +17,15 @@ import (
 	"github.com/lima-vm/lima/v2/pkg/ptr"
 )
 
+const MetaWarnings = "io.lima-vm/warnings"
+
 func (ts *ToolSet) ListDirectory(ctx context.Context,
 	_ *mcp.CallToolRequest, args msi.ListDirectoryParams,
 ) (*mcp.CallToolResult, *msi.ListDirectoryResult, error) {
 	if ts.inst == nil {
 		return nil, nil, errors.New("instance not registered")
 	}
-	guestPath, logs, err := ts.TranslateHostPath(args.Path)
+	guestPath, warnings, err := ts.TranslateHostPath(args.Path)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -44,10 +46,8 @@ func (ts *ToolSet) ListDirectory(ctx context.Context,
 	callToolRes := &mcp.CallToolResult{
 		StructuredContent: res,
 	}
-	if logs != "" {
-		callToolRes.Meta = map[string]any{
-			"io.lima-vm/logs": []string{logs},
-		}
+	if warnings != "" {
+		callToolRes.Meta[MetaWarnings] = warnings
 	}
 	return callToolRes, res, nil
 }
@@ -58,7 +58,7 @@ func (ts *ToolSet) ReadFile(_ context.Context,
 	if ts.inst == nil {
 		return nil, nil, errors.New("instance not registered")
 	}
-	guestPath, logs, err := ts.TranslateHostPath(args.Path)
+	guestPath, warnings, err := ts.TranslateHostPath(args.Path)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -82,10 +82,8 @@ func (ts *ToolSet) ReadFile(_ context.Context,
 		// (e.g., [File content truncated: showing lines 1-100 of 500 total lines...]\nActual file content...).
 		StructuredContent: res,
 	}
-	if logs != "" {
-		callToolRes.Meta = map[string]any{
-			"io.lima-vm/logs": []string{logs},
-		}
+	if warnings != "" {
+		callToolRes.Meta[MetaWarnings] = warnings
 	}
 	return callToolRes, res, nil
 }
@@ -96,7 +94,7 @@ func (ts *ToolSet) WriteFile(_ context.Context,
 	if ts.inst == nil {
 		return nil, nil, errors.New("instance not registered")
 	}
-	guestPath, logs, err := ts.TranslateHostPath(args.Path)
+	guestPath, warnings, err := ts.TranslateHostPath(args.Path)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -121,10 +119,8 @@ func (ts *ToolSet) WriteFile(_ context.Context,
 		// or `Successfully created and wrote to new file: /path/to/new/file.txt.`
 		StructuredContent: res,
 	}
-	if logs != "" {
-		callToolRes.Meta = map[string]any{
-			"io.lima-vm/logs": []string{logs},
-		}
+	if warnings != "" {
+		callToolRes.Meta[MetaWarnings] = warnings
 	}
 	return callToolRes, res, nil
 }
@@ -142,7 +138,7 @@ func (ts *ToolSet) Glob(_ context.Context,
 	if args.Path != nil && *args.Path != "" {
 		pathStr = *args.Path
 	}
-	guestPath, logs, err := ts.TranslateHostPath(pathStr)
+	guestPath, warnings, err := ts.TranslateHostPath(pathStr)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -162,10 +158,8 @@ func (ts *ToolSet) Glob(_ context.Context,
 		// A message like: Found 5 file(s) matching "*.ts" within src, sorted by modification time (newest first):\nsrc/file1.ts\nsrc/subdir/file2.ts...
 		StructuredContent: res,
 	}
-	if logs != "" {
-		callToolRes.Meta = map[string]any{
-			"io.lima-vm/logs": []string{logs},
-		}
+	if warnings != "" {
+		callToolRes.Meta[MetaWarnings] = warnings
 	}
 	return callToolRes, res, nil
 }
@@ -183,7 +177,7 @@ func (ts *ToolSet) SearchFileContent(ctx context.Context,
 	if args.Path != nil && *args.Path != "" {
 		pathStr = *args.Path
 	}
-	guestPath, logs, err := ts.TranslateHostPath(pathStr)
+	guestPath, warnings, err := ts.TranslateHostPath(pathStr)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -205,10 +199,8 @@ func (ts *ToolSet) SearchFileContent(ctx context.Context,
 		// A message like: Found 10 matching lines for regex "function\\s+myFunction" in directory src:\nsrc/file1.js:10:function myFunction() {...}\nsrc/subdir/file2.ts:45:    function myFunction(param) {...}...
 		StructuredContent: res,
 	}
-	if logs != "" {
-		callToolRes.Meta = map[string]any{
-			"io.lima-vm/logs": []string{logs},
-		}
+	if warnings != "" {
+		callToolRes.Meta[MetaWarnings] = warnings
 	}
 	return callToolRes, res, nil
 }
